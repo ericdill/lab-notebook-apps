@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Confined Spheres Cell Designer</title>
+  <link rel="stylesheet" href="./src/styles.css">
+
+</head>
+<body>
+  <main>
+    <div class="app-shell">
+      <section class="controls" aria-label="Cell controls">
+        <div class="title-block">
+          <h1>Simulation Cell Designer</h1>
+          <p>Define the particle packing and the tight container that will become the LAMMPS simulation cell.</p>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">
+            <span>Coordination number</span>
+            <span id="coordinationLabel">CN = 4</span>
+          </div>
+          <div class="segmented" role="radiogroup" aria-label="Coordination number">
+            <label>
+              <input type="radio" name="coordination" value="4" checked>
+              <span>Square CN=4</span>
+            </label>
+            <label>
+              <input type="radio" name="coordination" value="6">
+              <span>Hex CN=6</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="edgeCount">
+            <span id="edgeCountLabel">Spheres per edge</span>
+            <span id="edgeCountValue">6</span>
+          </label>
+          <input id="edgeCount" type="range" min="2" max="16" step="1" value="6">
+          <input id="edgeCountNumber" type="number" min="2" max="64" step="1" value="6">
+          <div class="hint" id="edgeCountHint">For CN=4 this creates a square n by n lattice.</div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="tightness">
+            <span>Box looseness</span>
+            <span id="tightnessValue">0.10 r</span>
+          </label>
+          <input id="tightness" type="range" min="0" max="1" step="0.01" value="0.1">
+          <input id="tightnessNumber" type="number" min="0" max="10" step="0.01" value="0.1">
+          <div class="hint">0 is tangent to the outer particles. 0.10 adds 0.10 particle radii of clearance to the container.</div>
+        </div>
+
+        <div class="metrics" aria-label="Cell metrics">
+          <div class="metric">
+            <b id="particleCount">36</b>
+            <span>active particles</span>
+          </div>
+          <div class="metric">
+            <b id="nearestNeighbor">2.00 r</b>
+            <span>nearest-neighbor spacing</span>
+          </div>
+          <div class="metric">
+            <b id="cellWidth">12.20 r</b>
+            <span>cell width</span>
+          </div>
+          <div class="metric">
+            <b id="cellHeight">12.20 r</b>
+            <span>cell height</span>
+          </div>
+        </div>
+
+        <div class="section-heading">
+          <h2>Driving forces</h2>
+          <button id="addForce" type="button">Add force</button>
+        </div>
+        <div id="forceList" class="force-list" aria-label="Driving force controls"></div>
+
+        <div class="section-heading">
+          <h2>Runtime</h2>
+        </div>
+        <div class="runtime-grid" aria-label="LAMMPS runtime controls">
+          <label>
+            <span>Timestep</span>
+            <input id="timestep" type="number" min="0.000001" step="0.0001" value="0.001">
+          </label>
+          <label>
+            <span>Run steps</span>
+            <input id="runSteps" type="number" min="1" step="1000" value="50000">
+          </label>
+          <label>
+            <span>Dump every</span>
+            <input id="dumpEvery" type="number" min="1" step="100" value="500">
+          </label>
+          <label>
+            <span>Thermo every</span>
+            <input id="thermoEvery" type="number" min="1" step="100" value="1000">
+          </label>
+        </div>
+        <div class="hint" id="runtimeSummary">Simulated time 50, about 101 trajectory frames.</div>
+
+        <div class="section-heading">
+          <h2>Export</h2>
+        </div>
+        <div class="export-actions" aria-label="Export files">
+          <button id="downloadConfig" type="button">simulation.json</button>
+          <button id="downloadData" type="button">particles.data</button>
+          <button id="downloadInput" type="button">LAMMPS input</button>
+          <button id="downloadReadme" type="button">README</button>
+        </div>
+
+        <div class="section-heading">
+          <h2>Install & run</h2>
+        </div>
+        <div class="run-panel" aria-label="LAMMPS install and run commands">
+          <div>
+            <strong>Ubuntu/Debian</strong>
+            <code>sudo apt-get install lammps</code>
+          </div>
+          <div>
+            <strong>macOS/Homebrew</strong>
+            <code>brew install lammps</code>
+          </div>
+          <div>
+            <strong>Conda</strong>
+            <code>conda install lammps</code>
+          </div>
+          <div>
+            <strong>Run export</strong>
+            <code>lmp -in in.confined_spheres.lammps</code>
+          </div>
+        </div>
+
+        <pre id="cellJson" class="json-panel" aria-label="Cell JSON"></pre>
+      </section>
+
+      <section class="viewport" aria-label="Simulation cell preview">
+        <div class="toolbar">
+          <div>
+            <h2 id="previewTitle">Square cell</h2>
+            <p id="previewSubtitle">6 spheres along each edge, 0.10 r clearance</p>
+          </div>
+          <div class="legend" aria-label="Preview legend">
+            <span><i class="swatch"></i> particle radius</span>
+            <span><i class="swatch boundary"></i> simulation boundary</span>
+            <span><i class="swatch force"></i> driving force</span>
+          </div>
+        </div>
+        <div class="trajectory-panel viewport-trajectory" aria-label="Trajectory controls">
+          <input id="trajectoryFile" type="file" accept=".lammpstrj,.dump,.txt">
+          <div class="segmented" role="radiogroup" aria-label="View mode">
+            <label>
+              <input type="radio" name="viewMode" value="setup" checked>
+              <span>Build</span>
+            </label>
+            <label>
+              <input type="radio" name="viewMode" value="trajectory">
+              <span>Analyze</span>
+            </label>
+          </div>
+          <div class="trajectory-controls">
+            <button id="playTrajectory" type="button" disabled>Play</button>
+            <input id="trajectoryFrame" type="range" min="0" max="0" step="1" value="0" disabled>
+          </div>
+          <div id="trajectoryStatus" class="hint">Import a LAMMPS dump to scrub frames.</div>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="previewCanvas"></canvas>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script type="module" src="./src/main.js"></script>
+
+</body>
+</html>

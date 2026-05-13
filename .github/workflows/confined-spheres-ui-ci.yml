@@ -1,0 +1,34 @@
+name: Confined Spheres UI CI
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/confined-spheres-ui-ci.yml"
+      - "projects/03-confined-spheres-ui/**"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/confined-spheres-ui-ci.yml"
+      - "projects/03-confined-spheres-ui/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install LAMMPS
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lammps
+
+      - name: Run UI tests
+        working-directory: projects/03-confined-spheres-ui
+        run: npm test
