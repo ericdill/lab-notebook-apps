@@ -19,3 +19,7 @@ The confined-spheres app should be available at:
 ```text
 https://ericdill.github.io/lab-notebook-apps/projects/03-confined-spheres-ui/
 ```
+
+## License
+
+MIT. See [LICENSE](./LICENSE).
